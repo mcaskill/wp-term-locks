@@ -3,7 +3,7 @@ Contributors: johnjamesjacoby, stuttter, mcaskill
 Tags: taxonomy, term, meta, metadata, lock, locks
 Tested up to: 4.8
 Requires at least: 4.7
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9Q4F4EL5YJ62J
@@ -80,6 +80,12 @@ $terms = get_terms( 'category', array(
 http://github.com/mcaskill/wp-term-locks/
 
 == Changelog ==
+
+= 1.1.0 =
+* Add .editorconfig
+* Cleanup and reorganize plugin
+* Fix unassigned capability
+* Rename db_version_key
 
 = 1.0.1 =
 * Fix single-site capabilities check

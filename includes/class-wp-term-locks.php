@@ -22,7 +22,7 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     /**
      * @var string Plugin version.
      */
-    public $version = '1.0.1';
+    public $version = '1.1.0';
 
     /**
      * @var string Database version.
