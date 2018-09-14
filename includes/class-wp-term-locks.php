@@ -278,17 +278,17 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
 
         // Locked?
         $locks = $this->get_meta( $term->term_id );
-        $time  = current_time( 'mysql' );
+        $_lock = sprintf( '%s:%s', time(), get_current_user_id() );
 
         // Edit lock time
-        $edit_time = ! empty( $locks['edit'] )
+        $edit_lock = ! empty( $locks['edit'] )
             ? $locks['edit']
-            : $time;
+            : $_lock;
 
         // Delete lock time
-        $delete_time = ! empty( $locks['delete'] )
+        $delete_lock = ! empty( $locks['delete'] )
             ? $locks['delete']
-            : $time;
+            : $_lock;
 
         ?>
 
@@ -302,13 +302,13 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
                 <ul>
                     <li>
                         <label>
-                            <input type="checkbox" name="term-locks[edit]" value="<?php echo esc_attr( $edit_time ); ?>" <?php checked( ! empty( $locks['edit'] ) ); ?> />
+                            <input type="checkbox" name="term-locks[edit]" value="<?php echo esc_attr( $edit_lock ); ?>" <?php checked( ! empty( $locks['edit'] ) ); ?> />
                             <span class="term-lock-edit"><?php esc_html_e( 'Edit Lock', 'wp-term-locks' ); ?></span>
                         </label>
                     </li>
                     <li>
                         <label>
-                            <input type="checkbox" name="term-locks[delete]" value="<?php echo esc_attr( $delete_time ); ?>" <?php checked( ! empty( $locks['delete'] ) ); ?> />
+                            <input type="checkbox" name="term-locks[delete]" value="<?php echo esc_attr( $delete_lock ); ?>" <?php checked( ! empty( $locks['delete'] ) ); ?> />
                             <span class="term-lock-delete"><?php esc_html_e( 'Delete Lock', 'wp-term-locks' ); ?></span>
                         </label>
                     </li>
