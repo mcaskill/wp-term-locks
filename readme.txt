@@ -57,16 +57,16 @@ http://codex.wordpress.org/Class_Reference/WP_Meta_Query
 
 `
 $terms = get_terms( 'category', array(
-	'depth'      => 1,
-	'number'     => 100,
-	'parent'     => 0,
-	'hide_empty' => false,
+    'depth'      => 1,
+    'number'     => 100,
+    'parent'     => 0,
+    'hide_empty' => false,
 
-	// Query by lock
-	'meta_query' => array( array(
-		'key'   => 'locks',
-		'value' => ''
-	) )
+    // Query by lock
+    'meta_query' => array( array(
+        'key'   => 'locks',
+        'value' => '',
+    ) )
 ) );
 `
 

@@ -23,12 +23,12 @@ defined( 'ABSPATH' ) || exit;
  */
 function _wp_term_locks() {
 
-	// Setup the main file
-	$plugin_path = plugin_dir_path( __FILE__ );
+    // Setup the main file
+    $plugin_path = plugin_dir_path( __FILE__ );
 
-	// Classes
-	require_once $plugin_path . 'includes/class-wp-term-meta-ui.php';
-	require_once $plugin_path . 'includes/class-wp-term-locks.php';
+    // Classes
+    require_once $plugin_path . 'includes/class-wp-term-meta-ui.php';
+    require_once $plugin_path . 'includes/class-wp-term-locks.php';
 }
 add_action( 'plugins_loaded', '_wp_term_locks' );
 
@@ -38,6 +38,6 @@ add_action( 'plugins_loaded', '_wp_term_locks' );
  * @since 0.2.0
  */
 function _wp_term_locks_init() {
-	new WP_Term_Locks( __FILE__ );
+    new WP_Term_Locks( __FILE__ );
 }
 add_action( 'init', '_wp_term_locks_init', 88 );
