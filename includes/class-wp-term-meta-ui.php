@@ -25,8 +25,8 @@ if ( function_exists( 'add_term_meta' ) && ! class_exists( 'WP_Term_Meta_UI' ) )
  *
  * @since 0.1.0
  */
-class WP_Term_Meta_UI {
-
+class WP_Term_Meta_UI
+{
     /**
      * @var string Plugin version
      */
@@ -106,8 +106,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function __construct( $file = '' ) {
-
+    public function __construct( $file = '' )
+    {
         // Setup plugin
         $this->file       = $file;
         $this->url        = plugin_dir_url( $this->file );
@@ -175,7 +175,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.5
      */
-    public function register_meta() {
+    public function register_meta()
+    {
         register_meta(
             'term',
             $this->meta_key,
@@ -192,7 +193,8 @@ class WP_Term_Meta_UI {
      * @param   mixed $data
      * @return  mixed
      */
-    public function sanitize_callback( $data = '' ) {
+    public function sanitize_callback( $data = '' )
+    {
         return $data;
     }
 
@@ -210,8 +212,8 @@ class WP_Term_Meta_UI {
      *
      * @return boolean
      */
-    public function auth_callback( $allowed = false, $meta_key = '', $post_id = 0, $user_id = 0, $cap = '', $caps = array() ) {
-
+    public function auth_callback( $allowed = false, $meta_key = '', $post_id = 0, $user_id = 0, $cap = '', $caps = array() )
+    {
         // Bail if incorrect meta key
         if ( $meta_key !== $this->meta_key ) {
             return $allowed;
@@ -225,8 +227,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function admin_init() {
-
+    public function admin_init()
+    {
         // Check for DB update
         $this->maybe_upgrade_database();
     }
@@ -236,7 +238,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function edit_tags_page() {
+    public function edit_tags_page()
+    {
         add_action( 'admin_head-edit-tags.php',          array( $this, 'help_tabs'       ) );
         add_action( 'admin_head-edit-tags.php',          array( $this, 'admin_head'      ) );
         add_action( 'admin_print_scripts-edit-tags.php', array( $this, 'enqueue_scripts' ) );
@@ -248,7 +251,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.9
      */
-    public function term_page() {
+    public function term_page()
+    {
         add_action( 'admin_head-term.php',          array( $this, 'admin_head'      ) );
         add_action( 'admin_print_scripts-term.php', array( $this, 'enqueue_scripts' ) );
     }
@@ -264,8 +268,8 @@ class WP_Term_Meta_UI {
      * @param  array   $args
      * @param  array   $taxonomies
      */
-    public function get_terms_orderby( $orderby = '' ) {
-
+    public function get_terms_orderby( $orderby = '' )
+    {
         // Ordering by meta key
         if ( ! empty( $_REQUEST['orderby'] ) && ( $this->meta_key === $_REQUEST['orderby'] ) ) {
             $orderby = 'meta_value';
@@ -283,7 +287,8 @@ class WP_Term_Meta_UI {
      * @param  array  $taxonomies
      * @param  array  $args
      */
-    public function terms_clauses( $clauses = array(), $taxonomies = array(), $args = array() ) {
+    public function terms_clauses( $clauses = array(), $taxonomies = array(), $args = array() )
+    {
         global $wpdb;
 
         // Default allowed keys & primary key
@@ -367,8 +372,8 @@ class WP_Term_Meta_UI {
      * @param array $args
      * @return array
      */
-    private function get_taxonomies( $args = array() ) {
-
+    private function get_taxonomies( $args = array() )
+    {
         // The filter key/tag
         $tag = "wp_term_{$this->meta_key}_get_taxonomies";
 
@@ -399,7 +404,8 @@ class WP_Term_Meta_UI {
      *
      * @return array
      */
-    public function add_column_header( $columns = array() ) {
+    public function add_column_header( $columns = array() )
+    {
         $columns[ $this->meta_key ] = $this->labels['singular'];
 
         return $columns;
@@ -416,8 +422,8 @@ class WP_Term_Meta_UI {
      *
      * @return mixed
      */
-    public function add_column_value( $empty = '', $custom_column = '', $term_id = 0 ) {
-
+    public function add_column_value( $empty = '', $custom_column = '', $term_id = 0 )
+    {
         // Bail if no taxonomy passed or not on the `meta_key` column
         if ( empty( $_REQUEST['taxonomy'] ) || ( $this->meta_key !== $custom_column ) || ! empty( $empty ) ) {
             return;
@@ -444,7 +450,8 @@ class WP_Term_Meta_UI {
      *
      * @return array
      */
-    public function sortable_columns( $columns = array() ) {
+    public function sortable_columns( $columns = array() )
+    {
         $columns[ $this->meta_key ] = $this->meta_key;
         return $columns;
     }
@@ -457,8 +464,8 @@ class WP_Term_Meta_UI {
      * @param  int     $term_id
      * @param  string  $taxonomy
      */
-    public function save_meta( $term_id = 0, $taxonomy = '' ) {
-
+    public function save_meta( $term_id = 0, $taxonomy = '' )
+    {
         // Get the term being posted
         $term_key = 'term-' . $this->meta_key;
 
@@ -480,8 +487,8 @@ class WP_Term_Meta_UI {
      * @param  string  $meta
      * @param  bool    $clean_cache
      */
-    public function set_meta( $term_id = 0, $taxonomy = '', $meta = '', $clean_cache = false ) {
-
+    public function set_meta( $term_id = 0, $taxonomy = '', $meta = '', $clean_cache = false )
+    {
         // No meta_key, so delete
         if ( empty( $meta ) ) {
             delete_term_meta( $term_id, $this->meta_key );
@@ -504,7 +511,8 @@ class WP_Term_Meta_UI {
      *
      * @param int $term_id
      */
-    public function get_meta( $term_id = 0 ) {
+    public function get_meta( $term_id = 0 )
+    {
         return get_term_meta( $term_id, $this->meta_key, true );
     }
 
@@ -515,7 +523,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function add_form_field() {
+    public function add_form_field()
+    {
         ?>
 
         <div class="form-field term-<?php echo esc_attr( $this->meta_key ); ?>-wrap">
@@ -545,7 +554,8 @@ class WP_Term_Meta_UI {
      *
      * @param object $term
      */
-    public function edit_form_field( $term = false ) {
+    public function edit_form_field( $term = false )
+    {
         ?>
 
         <tr class="form-field term-<?php echo esc_attr( $this->meta_key ); ?>-wrap">
@@ -578,8 +588,8 @@ class WP_Term_Meta_UI {
      *
      * @param  $term
      */
-    public function quick_edit_meta( $column_name = '', $screen = '', $name = '' ) {
-
+    public function quick_edit_meta( $column_name = '', $screen = '', $name = '' )
+    {
         // Bail if not the meta_key column on the `edit-tags` screen for a visible taxonomy
         if ( ( $this->meta_key !== $column_name ) || ( 'edit-tags' !== $screen ) || ! in_array( $name, $this->taxonomies ) ) {
             return false;
@@ -608,8 +618,8 @@ class WP_Term_Meta_UI {
      *
      * @param  $term
      */
-    protected function form_field( $term = '' ) {
-
+    protected function form_field( $term = '' )
+    {
         // Get the meta value
         $value = isset( $term->term_id )
             ?  $this->get_meta( $term->term_id )
@@ -627,7 +637,8 @@ class WP_Term_Meta_UI {
      *
      * @param  $term
      */
-    protected function quick_edit_form_field() {
+    protected function quick_edit_form_field()
+    {
         ?>
 
         <input type="text" class="ptitle" name="term-<?php echo esc_attr( $this->meta_key ); ?>" value="">
@@ -644,8 +655,8 @@ class WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    protected function maybe_upgrade_database() {
-
+    protected function maybe_upgrade_database()
+    {
         // Check DB for version
         $db_version = get_option( $this->db_version_key );
 
@@ -662,7 +673,8 @@ class WP_Term_Meta_UI {
      *
      * @param  int  $old_version
      */
-    private function upgrade_database( $old_version = 0 ) {
+    private function upgrade_database( $old_version = 0 )
+    {
         update_option( $this->db_version_key, $this->db_version );
     }
 }

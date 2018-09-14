@@ -17,8 +17,8 @@ if ( ! class_exists( 'WP_Term_Locks' ) ) :
  *
  * @since 0.1.0
  */
-final class WP_Term_Locks extends WP_Term_Meta_UI {
-
+final class WP_Term_Locks extends WP_Term_Meta_UI
+{
     /**
      * @var string Plugin version
      */
@@ -44,8 +44,8 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function __construct( $file = '' ) {
-
+    public function __construct( $file = '' )
+    {
         // Setup the labels
         $this->labels = array(
             'singular'    => esc_html__( 'Lock',  'wp-term-locks' ),
@@ -73,7 +73,8 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      *
      * @since 0.1.2
      */
-    public function help_tabs() {
+    public function help_tabs()
+    {
         get_current_screen()->add_help_tab(array(
             'id'      => 'wp_term_lock_help_tab',
             'title'   => __( 'Locks', 'wp-term-locks' ),
@@ -90,8 +91,8 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      * @param  array   $actions
      * @param  object  $term
      */
-    public function row_actions( $actions = array(), $term = null ) {
-
+    public function row_actions( $actions = array(), $term = null )
+    {
         // Bail if current user can manage
         if ( current_user_can( 'manage_term_locks' ) ) {
             return $actions;
@@ -122,8 +123,8 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      * @param  string  $name
      * @param  object  $term
      */
-    public function term_name( $name = '', $term = null ) {
-
+    public function term_name( $name = '', $term = null )
+    {
         // Skip term name if tag isn't an object
         if ( ! is_object( $term ) ) {
             return $name;
@@ -152,8 +153,8 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      * @param  int     $user_id
      * @param  array   $args
      */
-    public function map_meta_cap( $caps = array(), $cap = '', $user_id = 0, $args = array() ) {
-
+    public function map_meta_cap( $caps = array(), $cap = '', $user_id = 0, $args = array() )
+    {
         // Allow managing of term locks
         if ( 'manage_term_locks' === $cap ) {
 
@@ -206,15 +207,17 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
      *
      * @since 0.1.0
      */
-    public function add_form_field() { }
+    public function add_form_field()
+    {
+    }
 
     /**
      * Add lock fields for users with `manage_term_locks` capability
      *
      * @since 0.1.0
      */
-    public function edit_form_field( $term = false ) {
-
+    public function edit_form_field( $term = false )
+    {
         // Bail if user can't manage
         if ( ! current_user_can( 'manage_term_locks' ) ) {
             return;
@@ -232,7 +235,9 @@ final class WP_Term_Locks extends WP_Term_Meta_UI {
         // Delete lock time
         $delete_time = ! empty( $locks['delete'] )
             ? $locks['delete']
-            : $time; ?>
+            : $time;
+
+        ?>
 
         <tr class="form-field term-lock-wrap">
             <th scope="row" valign="top">
