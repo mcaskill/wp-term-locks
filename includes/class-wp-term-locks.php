@@ -27,7 +27,7 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     /**
      * @var string Database version.
      */
-    public $db_version = 201601290001;
+    public $db_version = 201809141200;
 
     /**
      * @var string Metadata key.
@@ -159,6 +159,22 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
 
         // Return name
         return $name;
+    }
+
+    /**
+     * Add new "manage_term_locks" capability to administrator role.
+     *
+     * @since 1.1.0
+     *
+     * @return void
+     */
+    public function add_meta_cap()
+    {
+        $admin_role = get_role( 'administrator' );
+
+        if ( $admin_role instanceof \WP_Role && ! $admin_role->has_cap( 'manage_term_locks' ) ) {
+            $admin_role->add_cap( 'manage_term_locks' );
+        }
     }
 
     /**
@@ -310,6 +326,40 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
         </tr>
 
         <?php
+    }
+
+    /** Installation*** *******************************************************/
+
+    /**
+     * Upgrade the database as needed, based on version comparisons.
+     *
+     * @since 1.1.0
+     *
+     * @abstract
+     *
+     * @param int $old_version The old database version number.
+     *
+     * @return void
+     */
+    private function upgrade( $old_version = 0 )
+    {
+        $this->add_meta_cap();
+    }
+
+    /**
+     * Install the plugin.
+     *
+     * @since 1.1.0
+     *
+     * @abstract
+     *
+     * @param int $old_version The old database version number.
+     *
+     * @return void
+     */
+    protected function install()
+    {
+        $this->add_meta_cap();
     }
 }
 endif;

@@ -9,7 +9,7 @@
  * and handle the sanitization & saving of values.
  *
  * @since 0.1.1
- * @version 0.1.9
+ * @version 0.1.10
  *
  * @package Plugins/Terms/Metadata/UI
  */
@@ -35,7 +35,7 @@ class WP_Term_Meta_UI
     /**
      * @var string Database version.
      */
-    protected $db_version = 201601010001;
+    protected $db_version = 201809141200;
 
     /**
      * @var string Database version.
@@ -127,7 +127,7 @@ class WP_Term_Meta_UI
 
         // Maybe build db version key
         if ( empty( $this->db_version_key ) ) {
-            $this->db_version_key = "wpdb_term_{$this->meta_key}_version";
+            $this->db_version_key = "wtm_term_{$this->meta_key}_version";
         }
 
         // Register Meta
@@ -767,14 +767,19 @@ class WP_Term_Meta_UI
      *
      * @return void
      */
-    protected function maybe_upgrade_database()
+    private function maybe_upgrade_database()
     {
         // Check DB for version
-        $db_version = get_option( $this->db_version_key );
+        $version = get_option( $this->db_version_key, 0 );
+
+        if ( 0 === $version ) {
+            $this->install();
+        }
 
         // Needs
-        if ( $db_version < $this->db_version ) {
-            $this->upgrade_database( $db_version );
+        if ( $version < $this->db_version ) {
+            $this->upgrade();
+            $this->upgrade_database( $version );
         }
     }
 
@@ -783,8 +788,6 @@ class WP_Term_Meta_UI
      *
      * @since 0.1.0
      *
-     * @global \wpdb $wpdb The WordPress database abstraction object.
-     *
      * @param int $old_version The old database version number.
      *
      * @return void
@@ -792,6 +795,36 @@ class WP_Term_Meta_UI
     private function upgrade_database( $old_version = 0 )
     {
         update_option( $this->db_version_key, $this->db_version );
+    }
+
+    /**
+     * Upgrade the database as needed, based on version comparisons.
+     *
+     * @since 1.1.0
+     *
+     * @abstract
+     *
+     * @param int $old_version The old database version number.
+     *
+     * @return void
+     */
+    private function upgrade( $old_version = 0 )
+    {
+    }
+
+    /**
+     * Install the plugin.
+     *
+     * @since 1.1.0
+     *
+     * @abstract
+     *
+     * @param int $old_version The old database version number.
+     *
+     * @return void
+     */
+    protected function install()
+    {
     }
 }
 endif;
