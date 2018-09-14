@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 function _wp_term_locks() {
 
 	// Setup the main file
-	$plugin_path = plugin_dir_path( __FILE__ ) . 'wp-term-locks/';
+	$plugin_path = plugin_dir_path( __FILE__ );
 
 	// Classes
 	require_once $plugin_path . 'includes/class-wp-term-meta-ui.php';
