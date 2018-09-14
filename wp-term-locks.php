@@ -17,9 +17,13 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Include the required files & dependencies
+ * Include the required files & dependencies.
  *
  * @since 0.1.0
+ *
+ * @listens WP#action:plugins_loaded
+ *
+ * @return void
  */
 function _wp_term_locks_load()
 {
@@ -33,9 +37,13 @@ function _wp_term_locks_load()
 add_action( 'plugins_loaded', '_wp_term_locks_load' );
 
 /**
- * Instantiate the main class
+ * Instantiate the main WordPress Term Locks class.
  *
  * @since 0.2.0
+ *
+ * @listens WP#action:init
+ *
+ * @return void
  */
 function _wp_term_locks_init()
 {

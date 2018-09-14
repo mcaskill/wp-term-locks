@@ -20,22 +20,22 @@ if ( ! class_exists( 'WP_Term_Locks' ) ) :
 final class WP_Term_Locks extends WP_Term_Meta_UI
 {
     /**
-     * @var string Plugin version
+     * @var string Plugin version.
      */
     public $version = '1.0.1';
 
     /**
-     * @var string Database version
+     * @var string Database version.
      */
     public $db_version = 201601290001;
 
     /**
-     * @var string Metadata key
+     * @var string Metadata key.
      */
     public $meta_key = 'locks';
 
     /**
-     * @var bool No column for lock metadata
+     * @var bool No column for lock metadata.
      */
     public $has_column = false;
 
@@ -43,14 +43,19 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
      * Hook into queries, admin screens, and more!
      *
      * @since 0.1.0
+     *
+     * @fires action:wp_term_meta_order_init
+     * @fires filter:wp_fancy_term_order
+     *
+     * @param string $file The plugin file.
      */
-    public function __construct( $file = '' )
+    public function __construct( $file = __FILE__ )
     {
         // Setup the labels
         $this->labels = array(
             'singular'    => esc_html__( 'Lock',  'wp-term-locks' ),
             'plural'      => esc_html__( 'Locks', 'wp-term-locks' ),
-            'description' => esc_html__( 'Lock this term from being edited or deleted.', 'wp-term-locks' )
+            'description' => esc_html__( 'Lock this term from being edited or deleted.', 'wp-term-locks' ),
         );
 
         // Call the parent and pass the file
@@ -62,20 +67,26 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
         }
 
         // Terrible hacks
-        add_filter( 'map_meta_cap', array( $this, 'map_meta_cap'  ), 99, 4 );
-        add_filter( 'term_name',    array( $this, 'term_name'     ), 99, 2 );
+        add_filter( 'map_meta_cap', array( $this, 'map_meta_cap' ), 99, 4 );
+        add_filter( 'term_name',    array( $this, 'term_name'    ), 99, 2 );
     }
 
     /** Assets ****************************************************************/
 
     /**
-     * Add help tabs for `lock` column
+     * Add help tabs for `lock` column.
      *
      * @since 0.1.2
+     *
+     * @listens WP#action:admin_head-{$hook_suffix}
+     *
+     * @override
+     *
+     * @return void
      */
     public function help_tabs()
     {
-        get_current_screen()->add_help_tab(array(
+        get_current_screen()->add_help_tab( array(
             'id'      => 'wp_term_lock_help_tab',
             'title'   => __( 'Locks', 'wp-term-locks' ),
             'content' => '<p>' . __( 'Some terms might be locked, preventing them from being edited or deleted.',         'wp-term-locks' ) . '</p>' .
@@ -84,12 +95,16 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     }
 
     /**
-     * Filter row actions
+     * Filter row actions.
      *
      * @since 0.1.0
      *
-     * @param  array   $actions
-     * @param  object  $term
+     * @listens WP#filter:{$taxonomy}_row_actions
+     *
+     * @param array  $actions An array of action links to be displayed.
+     * @param WP_Term $tag    Term object.
+     *
+     * @return array
      */
     public function row_actions( $actions = array(), $term = null )
     {
@@ -116,12 +131,16 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     }
 
     /**
-     * Filter term name
+     * Filter term name.
      *
      * @since 0.1.0
      *
-     * @param  string  $name
-     * @param  object  $term
+     * @listens WP#filter:term_name
+     *
+     * @param string  $name The term name, padded if not top-level.
+     * @param WP_Term $tag  Term object.
+     *
+     * @return string
      */
     public function term_name( $name = '', $term = null )
     {
@@ -143,15 +162,18 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     }
 
     /**
-     * Filter `map_meta_cap` and conditionally disallow editing & deleting if
-     * term is locked.
+     * Filter `map_meta_cap` and conditionally disallow editing & deleting if term is locked.
      *
      * @since 0.1.0
      *
-     * @param  array   $caps
-     * @param  string  $cap
-     * @param  int     $user_id
-     * @param  array   $args
+     * @listens WP#filter:map_meta_cap
+     *
+     * @param array  $caps    Returns the user's actual capabilities.
+     * @param string $cap     Capability name.
+     * @param int    $user_id The user ID.
+     * @param array  $args    Adds the context to the cap. Typically the object ID.
+     *
+     * @return array
      */
     public function map_meta_cap( $caps = array(), $cap = '', $user_id = 0, $args = array() )
     {
@@ -203,20 +225,35 @@ final class WP_Term_Locks extends WP_Term_Meta_UI
     }
 
     /**
-     * Empty "Add Term" form field
+     * Empty "Add Term" form field.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:{$taxonomy}_add_form_fields
+     *
+     * @override
+     *
+     * @return void
      */
     public function add_form_field()
     {
+        // do nothing
     }
 
     /**
-     * Add lock fields for users with `manage_term_locks` capability
+     * Add lock fields for users with `manage_term_locks` capability.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:{$taxonomy}_edit_form_fields
+     *
+     * @override
+     *
+     * @param object $tag Current taxonomy term object.
+     *
+     * @return void
      */
-    public function edit_form_field( $term = false )
+    public function edit_form_field( $term )
     {
         // Bail if user can't manage
         if ( ! current_user_can( 'manage_term_locks' ) ) {

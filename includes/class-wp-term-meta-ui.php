@@ -28,32 +28,32 @@ if ( function_exists( 'add_term_meta' ) && ! class_exists( 'WP_Term_Meta_UI' ) )
 class WP_Term_Meta_UI
 {
     /**
-     * @var string Plugin version
+     * @var string Plugin version.
      */
     protected $version = '0.1.9';
 
     /**
-     * @var string Database version
+     * @var string Database version.
      */
     protected $db_version = 201601010001;
 
     /**
-     * @var string Database version
+     * @var string Database version.
      */
     protected $db_version_key = '';
 
     /**
-     * @var string Metadata key
+     * @var string Metadata key.
      */
     protected $meta_key = '';
 
     /**
-     * @var string No value
+     * @var string No value.
      */
     protected $no_value = '&#8212;';
 
     /**
-     * @var array Array of labels
+     * @var array Array of labels.
      */
     protected $labels = array(
         'singular'   => '',
@@ -62,22 +62,22 @@ class WP_Term_Meta_UI
     );
 
     /**
-     * @var string File for plugin
+     * @var string File for plugin.
      */
     public $file = '';
 
     /**
-     * @var string URL to plugin
+     * @var string URL to plugin.
      */
     public $url = '';
 
     /**
-     * @var string Path to plugin
+     * @var string Path to plugin.
      */
     public $path = '';
 
     /**
-     * @var string Basename for plugin
+     * @var string Basename for plugin.
      */
     public $basename = '';
 
@@ -87,17 +87,17 @@ class WP_Term_Meta_UI
     public $taxonomies = array();
 
     /**
-     * @var bool Whether to use fancy UI
+     * @var bool Whether to use fancy UI.
      */
     public $fancy = false;
 
     /**
-     * @var bool Whether to show a column
+     * @var bool Whether to show a column.
      */
     public $has_column = true;
 
     /**
-     * @var bool Whether to show fields
+     * @var bool Whether to show fields.
      */
     public $has_fields = true;
 
@@ -105,8 +105,13 @@ class WP_Term_Meta_UI
      * Hook into queries, admin screens, and more!
      *
      * @since 0.1.0
+     *
+     * @fires filter:wp_fancy_term_{$meta_key}
+     * @fires action:wp_term_meta_{$meta_key}/init
+     *
+     * @param string $file The plugin file.
      */
-    public function __construct( $file = '' )
+    public function __construct( $file = __FILE__ )
     {
         // Setup plugin
         $this->file       = $file;
@@ -129,8 +134,8 @@ class WP_Term_Meta_UI
         $this->register_meta();
 
         // Queries
-        add_action( 'create_term', array( $this, 'save_meta' ), 10, 2 );
-        add_action( 'edit_term',   array( $this, 'save_meta' ), 10, 2 );
+        add_action( 'create_term', array( $this, 'save_meta' ), 10, 3 );
+        add_action( 'edit_term',   array( $this, 'save_meta' ), 10, 3 );
 
         // Term meta orderby
         add_filter( 'terms_clauses',     array( $this, 'terms_clauses'     ), 10, 3 );
@@ -168,10 +173,13 @@ class WP_Term_Meta_UI
                 add_action( 'load-term.php',      array( $this, 'term_page'      ) );
             }
         }
+
+        // Pass ths object into an action
+        do_action( "wp_term_meta_{$this->meta_key}/init", $this );
     }
 
     /**
-     * Register term meta, key, and callbacks
+     * Registers {@see static::$meta_key}.
      *
      * @since 0.1.5
      */
@@ -186,31 +194,39 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Stub method for sanitizing meta data
+     * Sanitize {@see static::$meta_key} data.
+     *
+     * @see self::register_meta()
      *
      * @since 0.1.5
+     * @since 1.1.0 Updated method to reflect parameters documented in wp-includes/taxonomy.php
      *
-     * @param   mixed $data
-     * @return  mixed
+     * @param mixed  $meta_value The meta value.
+     * @param string $meta_key   The meta key.
+     * @param string $meta_type  The meta type.
+     *
+     * @return mixed The meta value.
      */
-    public function sanitize_callback( $data = '' )
+    public function sanitize_callback( $meta_value = '', $meta_key, $meta_type )
     {
-        return $data;
+        return $meta_value;
     }
 
     /**
-     * Stub method for authorizing the saving of meta data
+     * Check authorization for {@see static::$meta_key} data.
+     *
+     * @see self::register_meta()
      *
      * @since 0.1.5
      *
-     * @param  bool    $allowed
-     * @param  string  $meta_key
-     * @param  int     $post_id
-     * @param  int     $user_id
-     * @param  string  $cap
-     * @param  array   $caps
+     * @param boolean $allowed  True if allowed to view the meta field by default, false if else.
+     * @param string  $meta_key The meta key.
+     * @param integer $post_id  The post ojbect ID.
+     * @param integer $user_id  The user ID.
+     * @param string  $cap      The meta capability.
+     * @param array   $caps     An array of capabilities.
      *
-     * @return boolean
+     * @return boolean TRUE if auhtorized to view the meta field by default, FALSE if else.
      */
     public function auth_callback( $allowed = false, $meta_key = '', $post_id = 0, $user_id = 0, $cap = '', $caps = array() )
     {
@@ -223,9 +239,13 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Administration area hooks
+     * Fires as an admin screen or script is being initialized.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:admin_init
+     *
+     * @return void
      */
     public function admin_init()
     {
@@ -234,9 +254,13 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Administration area hooks
+     * Edit tags administration screen.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:load-{$page_hook}
+     *
+     * @return void
      */
     public function edit_tags_page()
     {
@@ -247,9 +271,13 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Administration area hooks
+     * Edit term administration screen.
      *
      * @since 0.1.9
+     *
+     * @listens WP#action:load-{$page_hook}
+     *
+     * @return void
      */
     public function term_page()
     {
@@ -260,13 +288,15 @@ class WP_Term_Meta_UI
     /** Get Terms *************************************************************/
 
     /**
-     * Filter `get_terms_args` and tweak for meta_query orderby's
+     * Filter `get_terms_args` and tweak for meta_query orderby's.
      *
      * @since 0.1.5
      *
-     * @param  string  $orderby
-     * @param  array   $args
-     * @param  array   $taxonomies
+     * @listens WP#filter:get_terms_orderby
+     *
+     * @param string $orderby `ORDERBY` clause of the terms query.
+     *
+     * @return string
      */
     public function get_terms_orderby( $orderby = '' )
     {
@@ -279,13 +309,17 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Filter get_terms() and maybe order by meta data
+     * Filter get_terms() and maybe order by meta data.
      *
      * @since 0.1.5
      *
-     * @param  array  $clauses
-     * @param  array  $taxonomies
-     * @param  array  $args
+     * @listens WP#filter:terms_clauses
+     *
+     * @param array $clauses    Terms query SQL clauses.
+     * @param array $taxonomies An array of taxonomies.
+     * @param array $args       An array of terms query arguments.
+     *
+     * @return array
      */
     public function terms_clauses( $clauses = array(), $taxonomies = array(), $args = array() )
     {
@@ -337,52 +371,86 @@ class WP_Term_Meta_UI
     /** Assets ****************************************************************/
 
     /**
-     * Enqueue quick-edit JS
+     * Enqueue quick-edit JS.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:admin_print_scripts-{$hook_suffix}
+     *
+     * @abstract
+     *
+     * @return void
      */
-    public function enqueue_scripts() { }
+    public function enqueue_scripts()
+    {
+    }
 
     /**
-     * Add help tabs for this metadata
+     * Add help tabs for this {@see static::$meta_key}.
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:admin_head-{$hook_suffix}
+     *
+     * @abstract
+     *
+     * @return void
      */
-    public function help_tabs() { }
+    public function help_tabs()
+    {
+    }
 
     /**
      * Add help tabs for this metadata
      *
      * @since 0.1.2
+     *
+     * @abstract
+     *
+     * @return void
      */
-    public function admin_head() { }
+    public function admin_head()
+    {
+    }
 
     /**
-     * Quick edit ajax updating
+     * Quick edit ajax updating.
      *
      * @since 0.1.1
+     *
+     * @listens WP#action:wp_ajax_{$action} This action is documented in wp-admin/admin-ajax.php
+     *
+     * @abstract
+     *
+     * @return void
      */
-    public function ajax_update() {}
+    public function ajax_update()
+    {
+    }
 
     /**
-     * Return the taxonomies used by this plugin
+     * Return the taxonomies used by this plugin.
      *
      * @since 0.1.0
      *
-     * @param array $args
-     * @return array
+     * @fires filter:wp_term_{$meta_key}_get_taxonomies
+     *
+     * @param array $args Optional. An array of `key => value` arguments to match against the taxonomy objects.
+     *
+     * @return array A list of taxonomy names or objects.
      */
     private function get_taxonomies( $args = array() )
     {
-        // The filter key/tag
-        $tag = "wp_term_{$this->meta_key}_get_taxonomies";
-
         /**
-         * Allow filtering of affected taxonomies
+         * Allow filtering of affected taxonomies.
          *
          * @since 0.1.3
+         *
+         * @event filter:wp_term_{$meta_key}_get_taxonomies
+         *
+         * @param array $args An array of `key => value` arguments to match against the taxonomy objects.
          */
-        $defaults = apply_filters( $tag, array(
+        $defaults = apply_filters( "wp_term_{$this->meta_key}_get_taxonomies", array(
             'show_ui' => true
         ) );
 
@@ -396,11 +464,13 @@ class WP_Term_Meta_UI
     /** Columns ***************************************************************/
 
     /**
-     * Add the "meta_key" column to taxonomy terms list-tables
+     * Add the {@see static::$meta_key} column to taxonomy terms list-tables.
      *
      * @since 0.1.0
      *
-     * @param array $columns
+     * @listens WP#filter:manage_{$screen->id}_columns
+     *
+     * @param array $columns An array of column headers.
      *
      * @return array
      */
@@ -412,13 +482,15 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Output the value for the custom column
+     * Output the value for the custom column.
      *
      * @since 0.1.0
      *
-     * @param string $empty
-     * @param string $custom_column
-     * @param int    $term_id
+     * @listens WP#filter:manage_{$this->screen->taxonomy}_custom_column
+     *
+     * @param string $empty       Blank string.
+     * @param string $column_name Name of the column.
+     * @param int    $term_id     Term ID.
      *
      * @return mixed
      */
@@ -426,90 +498,110 @@ class WP_Term_Meta_UI
     {
         // Bail if no taxonomy passed or not on the `meta_key` column
         if ( empty( $_REQUEST['taxonomy'] ) || ( $this->meta_key !== $custom_column ) || ! empty( $empty ) ) {
-            return;
+            return $empty;
         }
 
         // Get the metadata
-        $meta   = $this->get_meta( $term_id );
-        $retval = $this->no_value;
+        $meta = $this->get_meta( $term_id );
+        $out  = $this->no_value;
 
         // Output HTML element if not empty
         if ( ! empty( $meta ) ) {
-            $retval = $this->format_output( $meta );
+            $out = $this->format_output( $meta );
         }
 
-        echo $retval;
+        return $out;
     }
 
     /**
-     * Allow sorting by this `meta_key`
+     * Allow sorting by this {@see static::$meta_key}.
      *
      * @since 0.1.0
      *
-     * @param array $columns
+     * @listens WP#filter:manage_{$this->screen->id}_sortable_columns
+     *
+     * @param array $columns An array of sortable columns.
      *
      * @return array
      */
     public function sortable_columns( $columns = array() )
     {
         $columns[ $this->meta_key ] = $this->meta_key;
+
         return $columns;
     }
 
     /**
-     * Add `meta_key` to term when updating
+     * Adds data on {@see static::$meta_key} to a term.
      *
      * @since 0.1.0
+     * @since 1.1.0 Updated method to reflect parameters documented in wp-includes/taxonomy.php
      *
-     * @param  int     $term_id
-     * @param  string  $taxonomy
+     * @listens WP#action:create_term
+     * @listens WP#action:edit_term
+     *
+     * @param int    $term_id  Term ID.
+     * @param int    $tt_id    Term taxonomy ID.
+     * @param string $taxonomy Taxonomy slug.
+     *
+     * @return void
      */
-    public function save_meta( $term_id = 0, $taxonomy = '' )
+    public function save_meta( $term_id, $tt_id, $taxonomy )
     {
         // Get the term being posted
         $term_key = 'term-' . $this->meta_key;
 
         // Bail if not updating meta_key
-        $meta = ! empty( $_POST[ $term_key ] )
+        $value = ! empty( $_POST[ $term_key ] )
             ? $_POST[ $term_key ]
             : '';
 
-        $this->set_meta( $term_id, $taxonomy, $meta );
+        $this->set_meta( $term_id, $taxonomy, $value );
     }
 
     /**
-     * Set `meta_key` of a specific term
+     * Updates data on {@see static::$meta_key} to a term.
      *
      * @since 0.1.0
      *
-     * @param  int     $term_id
-     * @param  string  $taxonomy
-     * @param  string  $meta
-     * @param  bool    $clean_cache
+     * @param int    $term_id     Term ID.
+     * @param string $taxonomy    Taxonomy slug.
+     * @param string $meta_value  Metadata value.
+     * @param bool   $clean_cache Whether to clear the cached term.
+     *
+     * @return bool Whether the term was updated.
      */
-    public function set_meta( $term_id = 0, $taxonomy = '', $meta = '', $clean_cache = false )
+    public function set_meta( $term_id = 0, $taxonomy = '', $meta_value = '', $clean_cache = false )
     {
         // No meta_key, so delete
-        if ( empty( $meta ) ) {
-            delete_term_meta( $term_id, $this->meta_key );
+        if ( empty( $meta_value ) ) {
+            $result = delete_term_meta( $term_id, $this->meta_key );
 
         // Update meta_key value
         } else {
-            update_term_meta( $term_id, $this->meta_key, $meta );
+            $result = update_term_meta( $term_id, $this->meta_key, $meta_value );
+
+            if ( ! is_bool( $result ) ) {
+                $result = is_wp_error( $result ) ? false : (bool) $result;
+            }
         }
 
         // Maybe clean the term cache
         if ( true === $clean_cache ) {
             clean_term_cache( $term_id, $taxonomy );
         }
+
+        return $result;
     }
 
     /**
-     * Return the `meta_key` of a term
+     * Retrieves the data on {@see static::$meta_key} for a term.
      *
      * @since 0.1.0
      *
-     * @param int $term_id
+     * @param int $term_id Term ID.
+     *
+     * @return mixed A single metadata value.
      */
     public function get_meta( $term_id = 0 )
     {
@@ -522,6 +614,10 @@ class WP_Term_Meta_UI
      * Output the form field for this metadata when adding a new term
      *
      * @since 0.1.0
+     *
+     * @listens WP#action:{$taxonomy}_add_form_fields
+     *
+     * @return void
      */
     public function add_form_field()
     {
@@ -548,13 +644,17 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Output the form field when editing an existing term
+     * Output the form field when editing an existing term.
      *
      * @since 0.1.0
      *
-     * @param object $term
+     * @listens WP#action:{$taxonomy}_edit_form_fields
+     *
+     * @param object $term Current taxonomy term object.
+     *
+     * @return void
      */
-    public function edit_form_field( $term = false )
+    public function edit_form_field( $term )
     {
         ?>
 
@@ -582,16 +682,22 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Output the quick-edit field
+     * Output the quick-edit field.
      *
      * @since 0.1.0
      *
-     * @param  $term
+     * @listens WP#action:quick_edit_custom_box This action is fired in wp-admin/includes/class-wp-terms-list-table.php
+     *
+     * @param string $column_name Name of the column to edit.
+     * @param string $screen      The current screen name.
+     * @param string taxonomy     The taxonomy name, if any.
+     *
+     * @return void
      */
-    public function quick_edit_meta( $column_name = '', $screen = '', $name = '' )
+    public function quick_edit_meta( $column_name = '', $screen = '', $taxonomy = '' )
     {
         // Bail if not the meta_key column on the `edit-tags` screen for a visible taxonomy
-        if ( ( $this->meta_key !== $column_name ) || ( 'edit-tags' !== $screen ) || ! in_array( $name, $this->taxonomies ) ) {
+        if ( ( $this->meta_key !== $column_name ) || ( 'edit-tags' !== $screen ) || ! in_array( $taxonomy, $this->taxonomies ) ) {
             return false;
         } ?>
 
@@ -612,18 +718,22 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Output the form field
+     * Output the form field.
      *
      * @since 0.1.0
      *
-     * @param  $term
+     * @param object $term Current taxonomy term object.
+     *
+     * @return void
      */
-    protected function form_field( $term = '' )
+    protected function form_field( $term = null )
     {
         // Get the meta value
         $value = isset( $term->term_id )
             ?  $this->get_meta( $term->term_id )
-            : ''; ?>
+            : '';
+
+        ?>
 
         <input type="text" name="term-<?php echo esc_attr( $this->meta_key ); ?>" id="term-<?php echo esc_attr( $this->meta_key ); ?>" value="<?php echo esc_attr( $value ); ?>">
 
@@ -631,11 +741,11 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Output the form field
+     * Output the form field.
      *
      * @since 0.1.0
      *
-     * @param  $term
+     * @return void
      */
     protected function quick_edit_form_field()
     {
@@ -649,11 +759,13 @@ class WP_Term_Meta_UI
     /** Database Alters *******************************************************/
 
     /**
-     * Should a database update occur
+     * Should a database update occur.
      *
-     * Runs on `init`
+     * Runs on 'admin_init'.
      *
      * @since 0.1.0
+     *
+     * @return void
      */
     protected function maybe_upgrade_database()
     {
@@ -667,11 +779,15 @@ class WP_Term_Meta_UI
     }
 
     /**
-     * Upgrade the database as needed, based on version comparisons
+     * Upgrade the database as needed, based on version comparisons.
      *
      * @since 0.1.0
      *
-     * @param  int  $old_version
+     * @global \wpdb $wpdb The WordPress database abstraction object.
+     *
+     * @param int $old_version The old database version number.
+     *
+     * @return void
      */
     private function upgrade_database( $old_version = 0 )
     {
