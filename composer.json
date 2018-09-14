@@ -1,17 +1,25 @@
 {
-  "name": "stuttter/wp-term-locks",
-  "description": "Pretty locks for categories, tags, and other taxonomy terms",
-  "homepage": "https://github.com/stuttter/wp-term-locks",
-  "type": "wordpress-plugin",
-  "require": {
-    "php": ">=5.2",
-    "composer/installers": "^1.0"
-  },
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "John James Jacoby",
-      "email": "johnjamesjacoby@me.com"
+    "type": "wordpress-plugin",
+    "name": "mcaskill/wp-term-locks",
+    "description": "Pretty locks for categories, tags, and other taxonomy terms",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "John James Jacoby",
+            "email": "johnjamesjacoby@me.com"
+        },
+        {
+            "name": "Chauncey McAskill",
+            "email": "chauncey@mcaskill.ca"
+        }
+    ],
+    "require": {
+        "php": ">=5.2",
+        "composer/installers": "^1.5"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
-  ]
 }

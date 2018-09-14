@@ -30,7 +30,7 @@ class WP_Term_Meta_UI {
 	/**
 	 * @var string Plugin version
 	 */
-	protected $version = '0.0.0';
+	protected $version = '0.1.9';
 
 	/**
 	 * @var string Database version
